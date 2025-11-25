@@ -4,27 +4,27 @@ MAX_CONSTANTS = 10
 
 
 # Parse a formula, consult parseOutputs for return values.
-def parse(fmla: str):
+def parse(fmla: str) -> int:
     if parse_prop(fmla):
         return parse_prop(fmla)
     return parse_fol(fmla)
 
 # Return the LHS of a binary connective formula
-def lhs(fmla: str):
+def lhs(fmla: str) -> str:
     parts = split_binary(fmla)
     if parts:
         return parts[0]
     return ''
 
 # Return the connective symbol of a binary connective formula
-def con(fmla: str):
+def con(fmla: str) -> str:
     parts = split_binary(fmla)
     if parts:
         return parts[1]
     return ''
 
 # Return the RHS symbol of a binary connective formula
-def rhs(fmla: str):
+def rhs(fmla: str) -> str:
     parts = split_binary(fmla)
     if parts:
         return parts[2]
@@ -32,11 +32,11 @@ def rhs(fmla: str):
 
 
 # You may choose to represent a theory as a set or a list
-def theory(fmla: str):#initialise a theory with a single formula in it
+def theory(fmla: str) -> dict[str,list[str]]:#initialise a theory with a single formula in it
     return {'fmla':[fmla],'const':set(),'applied':{}}
 
 #check for satisfiability
-def sat(tableau: list):
+def sat(tableau: list[str]) -> int:
 #output 0 if not satisfiable, output 1 if satisfiable, output 2 if number of constants exceeds MAX_CONSTANTS
     while tableau:
         branch = tableau.pop()
@@ -62,11 +62,11 @@ def sat(tableau: list):
 # Helper functions
 # --------------------------------------------------
 
-def is_prop_atom(fmla: str):
+def is_prop_atom(fmla: str) -> bool:
     return fmla in ['p','q','r','s']
 
 
-def is_pred_atom(fmla: str):
+def is_pred_atom(fmla: str) -> bool:
     if len(fmla) < 4:
         return False
     if not fmla[0].isupper() or fmla[1] != '(' or fmla[-1] != ')':
@@ -80,7 +80,7 @@ def is_pred_atom(fmla: str):
     return all(len(p) == 1 and p.islower() for p in parts)
 
 
-def split_binary(fmla: str):
+def split_binary(fmla: str) -> tuple[str,str,str]:
     if len(fmla) < 5 or fmla[0] != '(' or fmla[-1] != ')':
         return None
     level = 0
@@ -102,7 +102,7 @@ def split_binary(fmla: str):
     return None
 
 
-def parse_prop(fmla: str):
+def parse_prop(fmla: str) -> int:
     if is_prop_atom(fmla):
         return 6
     if fmla.startswith('~'):
@@ -118,7 +118,7 @@ def parse_prop(fmla: str):
     return 0
 
 
-def parse_fol(fmla: str):
+def parse_fol(fmla: str) -> int:
     if is_pred_atom(fmla):
         return 1
     if fmla.startswith('~'):
@@ -140,7 +140,7 @@ def parse_fol(fmla: str):
     return 0
 
 
-def is_literal(fmla: str):
+def is_literal(fmla: str) -> bool:
     if parse_prop(fmla) == 6 or parse_fol(fmla) == 1:
         return True
     if fmla.startswith('~'):
@@ -149,7 +149,7 @@ def is_literal(fmla: str):
     return False
 
 
-def check_closed(formulas: list):
+def check_closed(formulas: list[str]) -> tuple[bool, set[str]]:
     literals = set()
     for f in formulas:
         if is_literal(f):
@@ -162,7 +162,7 @@ def check_closed(formulas: list):
     return False, literals
 
 
-def needs_expansion(fmla: str, branch: dict):
+def needs_expansion(fmla: str, branch: dict[str,list[str]]) -> bool:
     if is_literal(fmla):
         return False
     parsed = parse_fol(fmla)
@@ -177,18 +177,18 @@ def needs_expansion(fmla: str, branch: dict):
     return True
 
 
-def substitute_var(fmla: str, var: str, const: str):
+def substitute_var(fmla: str, var: str, const: str) -> str:
     return fmla.replace(var, const)
 
 
-def new_constant(existing: set):
+def new_constant(existing: set) -> str:
     for ch in 'abcdefghijklmnopqrstuvwxyz':
         if ch not in existing:
             return ch
     return 'c%s' % (len(existing)+1)
 
 
-def expand_formula(fmla: str, branch: dict):
+def expand_formula(fmla: str, branch: dict[str,list[str]]) -> list:
     formulas = [f for f in branch['fmla'] if f != fmla]
     consts = set(branch['const'])
     applied = {k:set(v) for k,v in branch.get('applied',{}).items()}
@@ -198,7 +198,7 @@ def expand_formula(fmla: str, branch: dict):
     return expand_fol(fmla, formulas, consts, applied)
 
 
-def expand_prop(fmla: str, formulas: list, consts: set, applied: dict):
+def expand_prop(fmla: str, formulas: list[str], consts: set, applied: dict[str, list[str]]) -> list[str]:
     res = []
     if fmla.startswith('~'):
         inner = fmla[1:]
@@ -233,7 +233,7 @@ def expand_prop(fmla: str, formulas: list, consts: set, applied: dict):
     return res
 
 
-def expand_fol(fmla: str, formulas: list, consts: set, applied: dict):
+def expand_fol(fmla: str, formulas: list[str], consts: set, applied: dict[str, list[str]]) -> list[str]:
     res = []
     if fmla.startswith('~'):
         inner = fmla[1:]
