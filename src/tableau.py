@@ -4,19 +4,19 @@ MAX_CONSTANTS = 10
 
 
 # Parse a formula, consult parseOutputs for return values.
-def parse(fmla):
+def parse(fmla: str):
     return 0
 
 # Return the LHS of a binary connective formula
-def lhs(fmla):
+def lhs(fmla: str):
     return ''
 
 # Return the connective symbol of a binary connective formula
-def con(fmla):
+def con(fmla: str):
     return ''
 
 # Return the RHS symbol of a binary connective formula
-def rhs(fmla):
+def rhs(fmla: str):
     return ''
 
 
